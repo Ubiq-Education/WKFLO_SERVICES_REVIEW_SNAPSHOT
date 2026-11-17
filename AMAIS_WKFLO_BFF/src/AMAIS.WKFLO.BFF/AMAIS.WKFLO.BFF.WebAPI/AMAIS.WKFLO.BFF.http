@@ -1,0 +1,6 @@
+# @AMAIS.WKFLO.BFF_HostAddress = http://localhost:5010
+
+# GET {{AMAIS.WKFLO.BFF_HostAddress}}/weatherforecast/
+# Accept: application/json
+
+###

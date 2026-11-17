@@ -1,0 +1,5 @@
+# Ignore missing Dockerfile HEALTHCHECK instruction
+DS-0026
+# Accept Automapper risk until 2027-02-01
+GHSA-rvv3-g6hj-g44x exp:2027-02-01
+CVE-2026-32933 exp:2027-02-01

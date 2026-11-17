@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMAIS.WKFLO.BFF.WebAPI", "AMAIS.WKFLO.BFF.WebAPI\AMAIS.WKFLO.BFF.WebAPI.csproj", "{D395D1CD-1AC7-418C-9FA0-3EA81A48B61C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AMAIS_WKFLO_COMMON", "AMAIS_WKFLO_COMMON", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMAIS.WKFLO.Common.Infrastructure", "..\..\..\AMAIS_WKFLO\AMAIS_WKFLO_COMMON\src\AMAIS.WKFLO.Common.Infrastructure\AMAIS.WKFLO.Common.Infrastructure.csproj", "{77CD7FC7-EB32-4C9E-4357-00761E80991C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D395D1CD-1AC7-418C-9FA0-3EA81A48B61C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D395D1CD-1AC7-418C-9FA0-3EA81A48B61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D395D1CD-1AC7-418C-9FA0-3EA81A48B61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D395D1CD-1AC7-418C-9FA0-3EA81A48B61C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77CD7FC7-EB32-4C9E-4357-00761E80991C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77CD7FC7-EB32-4C9E-4357-00761E80991C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77CD7FC7-EB32-4C9E-4357-00761E80991C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77CD7FC7-EB32-4C9E-4357-00761E80991C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{77CD7FC7-EB32-4C9E-4357-00761E80991C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {58D8D7D5-EA73-48FE-8198-37E5749FAE27}
+	EndGlobalSection
+EndGlobal

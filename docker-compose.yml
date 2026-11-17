@@ -1,0 +1,36 @@
+services:
+  amais-wkflo-md-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflomdwebapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_MD_API/src/AMAIS.WKFLO.MD/AMAIS.WKFLO.MD.WebAPI/Dockerfile
+
+  amais-wkflo-ai-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkfloaiwebapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_AI_API/src/AMAIS.WKFLO.AI/AMAIS.WKFLO.AI.WebAPI/Dockerfile
+
+  amais-wkflo-bff-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflobffwebapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_BFF/src/AMAIS.WKFLO.BFF/AMAIS.WKFLO.BFF.WebAPI/Dockerfile
+
+  amais-wkflo-worker-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkfloworkerwebapi
+    build:
+      context: ./
+      dockerfile: AMAIS_WKFLO_WORKER/src/AMAIS.WKFLO.Worker/AMAIS.WKFLO.Worker.WebAPI/Dockerfile
+
+  amais-wkflo-mcp-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflomcpwebapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_MCP_SERVER/src/AMAIS.WKFLO.MCP/AMAIS.WKFLO.MCP.WebAPI/Dockerfile
+
+  amais-wkflo-dxp-mcp-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflodxpmcpwebapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_DXP_MCP_SERVER/src/AMAIS.WKFLO.DXP.MCP/AMAIS.WKFLO.DXP.MCP.WebAPI/Dockerfile

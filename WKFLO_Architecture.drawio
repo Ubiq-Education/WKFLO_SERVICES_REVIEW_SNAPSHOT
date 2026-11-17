@@ -1,0 +1,149 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ═══════════ CLIENT ZONE ═══════════ -->
+    <mxCell id="z_client" value="Client Layer" style="swimlane;startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="30" width="1560" height="100" as="geometry" />
+    </mxCell>
+    <mxCell id="browser" value="Browser / Web UI&#xa;(React — separate repo)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="z_client">
+      <mxGeometry x="60" y="30" width="200" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="widget" value="Widget / iFrame Embed&#xa;(external site integration)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="z_client">
+      <mxGeometry x="300" y="30" width="200" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════ BFF ═══════════ -->
+    <mxCell id="bff" value="&lt;b&gt;BFF — YARP Reverse Proxy&lt;/b&gt;&#xa;ASP.NET Core 10 · Port :32771&#xa;/md/** → MD API  |  /ai/** → AI API  |  /mcp/** → MCP Server" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;html=1;" vertex="1" parent="1">
+      <mxGeometry x="440" y="190" width="420" height="70" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════ SERVICES ZONE ═══════════ -->
+    <mxCell id="z_services" value="WKFLO Platform Services" style="swimlane;startSize=28;fillColor=#f5f5f5;strokeColor=#666;fontStyle=1;fontSize=11;fontColor=#333;" vertex="1" parent="1">
+      <mxGeometry x="40" y="330" width="1560" height="140" as="geometry" />
+    </mxCell>
+    <mxCell id="md_api" value="&lt;b&gt;MD API&lt;/b&gt;&#xa;:32773&#xa;Agents · Tools · AI Models&#xa;Tenants · Secrets · KB" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;html=1;" vertex="1" parent="z_services">
+      <mxGeometry x="40" y="35" width="200" height="80" as="geometry" />
+    </mxCell>
+    <mxCell id="ai_api" value="&lt;b&gt;AI API&lt;/b&gt;&#xa;:32775&#xa;Chat Orchestration&#xa;Agent Execution · Session Mgmt" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;html=1;" vertex="1" parent="z_services">
+      <mxGeometry x="360" y="35" width="200" height="80" as="geometry" />
+    </mxCell>
+    <mxCell id="mcp_server" value="&lt;b&gt;MCP Server&lt;/b&gt;&#xa;:32875&#xa;Model Context Protocol&#xa;Blog · Pages · Gallery · Weather" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;html=1;" vertex="1" parent="z_services">
+      <mxGeometry x="680" y="35" width="200" height="80" as="geometry" />
+    </mxCell>
+    <mxCell id="worker" value="&lt;b&gt;Worker&lt;/b&gt;&#xa;Background Jobs&#xa;Dapr Workflows" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;html=1;" vertex="1" parent="z_services">
+      <mxGeometry x="1000" y="35" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════ AI ENGINE ZONE ═══════════ -->
+    <mxCell id="z_ai_engine" value="AI Engine (inside AI API)" style="swimlane;startSize=28;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="540" width="1560" height="200" as="geometry" />
+    </mxCell>
+    <mxCell id="sk_agent" value="&lt;b&gt;Semantic Kernel&lt;/b&gt;&#xa;ChatCompletionAgent&#xa;v1.76 + History Summarizer&#xa;Auto function-choice" style="rounded=1;fillColor=#e6ccff;strokeColor=#9933cc;fontSize=10;html=1;" vertex="1" parent="z_ai_engine">
+      <mxGeometry x="40" y="40" width="200" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="provider_abs" value="&lt;b&gt;AI Provider Abstraction&lt;/b&gt;&#xa;AIProviderHelper.GetKernel()&#xa;────────────────&#xa;Azure OpenAI  |  OpenAI&#xa;Anthropic  |  Google Gemini" style="rounded=1;fillColor=#e6ccff;strokeColor=#9933cc;fontSize=10;html=1;" vertex="1" parent="z_ai_engine">
+      <mxGeometry x="280" y="35" width="260" height="110" as="geometry" />
+    </mxCell>
+    <mxCell id="tool_system" value="&lt;b&gt;Tool / Plugin System&lt;/b&gt;&#xa;SemanticKernelExtensions.AddWkflowToolsAsync()&#xa;──────────────────────────────&#xa;Knowledge (Elasticsearch RAG)&#xa;Priority Q&amp;A (static answers)&#xa;MCP (external MCP servers)&#xa;AMAIS Integration (blog/pages/gallery)&#xa;Chat Classification (auto-routing)" style="rounded=1;fillColor=#e6ccff;strokeColor=#9933cc;fontSize=10;html=1;align=left;" vertex="1" parent="z_ai_engine">
+      <mxGeometry x="600" y="25" width="340" height="155" as="geometry" />
+    </mxCell>
+    <mxCell id="ltm" value="&lt;b&gt;Long-Term Memory (LTM)&lt;/b&gt;&#xa;pgvector similarity search&#xa;per-user collection" style="rounded=1;fillColor=#e6ccff;strokeColor=#9933cc;fontSize=10;html=1;" vertex="1" parent="z_ai_engine">
+      <mxGeometry x="1020" y="55" width="200" height="75" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════ DATA LAYER ═══════════ -->
+    <mxCell id="z_data" value="Data &amp; Infrastructure" style="swimlane;startSize=28;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="820" width="1560" height="140" as="geometry" />
+    </mxCell>
+    <mxCell id="sql" value="&lt;b&gt;SQL Server&lt;/b&gt;&#xa;EF Core 10&#xa;Agents · Tools · Tenants&#xa;TenantId FK isolation" style="shape=cylinder3;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="30" y="28" width="160" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="pgsql" value="&lt;b&gt;PostgreSQL / Neon&lt;/b&gt;&#xa;Npgsql + pgvector&#xa;1536-dim embeddings&#xa;Vector similarity search" style="shape=cylinder3;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="220" y="28" width="170" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="blob" value="&lt;b&gt;Azure Blob Storage&lt;/b&gt;&#xa;chat-history container&#xa;{tenant}/{user}/{agent}/&#xa;{session}.json" style="shape=cylinder3;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="420" y="28" width="170" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="redis" value="&lt;b&gt;Redis&lt;/b&gt;&#xa;EF Core L2 cache&#xa;30-min TTL&#xa;Dapr state" style="shape=cylinder3;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="620" y="28" width="150" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="elastic" value="&lt;b&gt;Elasticsearch&lt;/b&gt;&#xa;Knowledge base&#xa;Document full-text + RAG&#xa;Datastream search" style="shape=cylinder3;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="800" y="28" width="170" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="rabbitmq" value="&lt;b&gt;RabbitMQ&lt;/b&gt;&#xa;Dapr pub/sub&#xa;Event-driven messaging" style="shape=cylinder3;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="1000" y="28" width="160" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="otel" value="&lt;b&gt;OpenTelemetry&lt;/b&gt;&#xa;Grafana Alloy collector&#xa;Elasticsearch backend" style="shape=cylinder3;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;html=1;" vertex="1" parent="z_data">
+      <mxGeometry x="1200" y="28" width="160" height="90" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════ SECURITY CALLOUTS ═══════════ -->
+    <mxCell id="sec1" value="JWT Bearer Auth&#xa;Microsoft.Identity.Web&#xa;+ API Key (M2M)" style="shape=callout;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;html=1;" vertex="1" parent="1">
+      <mxGeometry x="900" y="178" width="210" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="sec2" value="Tenant Isolation&#xa;amais-wkflo-tenant-guid header&#xa;→ TenantContext (scoped DI)&#xa;→ TenantId FK in every query" style="shape=callout;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;html=1;" vertex="1" parent="1">
+      <mxGeometry x="1200" y="318" width="230" height="90" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════ EDGES ═══════════ -->
+    <!-- Client → BFF -->
+    <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="browser" target="bff" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="widget" target="bff" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- BFF → Services -->
+    <mxCell id="e3" value="/md/**" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;" edge="1" source="bff" target="md_api" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e4" value="/ai/**" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;" edge="1" source="bff" target="ai_api" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e5" value="/mcp/**" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;" edge="1" source="bff" target="mcp_server" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Services → AI Engine -->
+    <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="ai_api" target="sk_agent" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- SK → Provider -->
+    <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="sk_agent" target="provider_abs" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- SK → Tools -->
+    <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="sk_agent" target="tool_system" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Tools → MCP Server -->
+    <mxCell id="e9" value="HTTP/MCP" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;dashed=1;" edge="1" source="tool_system" target="mcp_server" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- Tools → Elasticsearch -->
+    <mxCell id="e10" value="KB search" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;" edge="1" source="tool_system" target="elastic" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- LTM → PostgreSQL -->
+    <mxCell id="e11" value="vector search" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;" edge="1" source="ltm" target="pgsql" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- AI API → Blob -->
+    <mxCell id="e12" value="chat history" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;" edge="1" source="ai_api" target="blob" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- MD API → SQL -->
+    <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="md_api" target="sql" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- AI API → SQL -->
+    <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="ai_api" target="sql" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <!-- MD API → Redis -->
+    <mxCell id="e15" value="L2 cache" style="edgeStyle=orthogonalEdgeStyle;fontSize=9;dashed=1;" edge="1" source="md_api" target="redis" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

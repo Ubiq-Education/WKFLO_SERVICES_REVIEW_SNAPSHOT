@@ -1,0 +1,29 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-ai
+spec:
+  type: pubsub.rabbitmq
+  version: v1
+  metadata:
+    # RabbitMQ connection
+    - name: connectionString
+      value: amqp://guest:guest@rabbitmq:5672
+
+    # Exchange configuration
+    - name: consumerID
+      value: ai-consumer
+    - name: exchangeKind
+      value: topic
+    - name: durable
+      value: "true"
+    - name: deletedWhenUnused
+      value: "false"
+    - name: autoAck
+      value: "false"
+
+    # Consumer tuning
+    - name: maxConcurrentHandlers
+      value: "5"
+    - name: prefetchCount
+      value: "1"

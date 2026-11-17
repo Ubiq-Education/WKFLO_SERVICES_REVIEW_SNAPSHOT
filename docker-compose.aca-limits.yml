@@ -1,0 +1,43 @@
+# Opt-in override that mirrors the Azure Container Apps sizing used on staging and prod
+# (0.25 CPU / 0.5 GiB per app container) so memory and CPU problems reproduce locally.
+# Applies to the six app services only; daprd sidecars, SQL, Redis, RabbitMQ, Alloy, placement
+# and scheduler are left unconstrained.
+#
+# Visual Studio: loaded automatically via <AdditionalComposeFilePaths> in docker-compose.dcproj.
+# To run without the limits, remove that line from docker-compose.dcproj locally.
+#
+# Command line (not loaded unless listed):
+#   docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.aca-limits.yml up
+
+services:
+  amais-wkflo-md-webapi:
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.25
+
+  # AI API gets 2 GB (not ACA's 0.5 GiB) so local debugging can show large-attachment memory peaks
+  # without the container being killed. Set it back to 512m to reproduce staging/prod OOMs.
+  amais-wkflo-ai-webapi:
+    mem_limit: 2g
+    memswap_limit: 2g
+    cpus: 0.25
+
+  amais-wkflo-bff-webapi:
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.25
+
+  amais-wkflo-worker-webapi:
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.25
+
+  amais-wkflo-mcp-webapi:
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.25
+
+  amais-wkflo-dxp-mcp-webapi:
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.25

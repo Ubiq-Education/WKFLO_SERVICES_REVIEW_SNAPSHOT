@@ -1,0 +1,18 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: dapr-config
+spec:
+  tracing:
+    samplingRate: "1"
+    otel:
+      # Must match the OTLP gRPC receiver actually running in docker-compose.override.yml.
+      # The "otel-collector"/"jaeger" services are commented out there in favor of Grafana
+      # Alloy (container name "alloy", see infra/alloy/config.alloy) — every app-level
+      # OTEL_EXPORTER_OTLP_ENDPOINT already points at http://alloy:4317. This sidecar-level
+      # config had drifted to the old hostname, so daprd's own tracing exporter (actor
+      # invocation / service invocation / pub-sub spans) was silently failing to connect and
+      # never reaching Tempo, even though app-level ASP.NET Core/HttpClient spans still made
+      # it through via the app's own OTLP exporter.
+      endpointAddress: "alloy:4317"
+      isSecure: false

@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[Secret]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+	[Name] NVARCHAR(500) NOT NULL,
+	[ApiKey] NVARCHAR(500) NOT NULL, -- For provider-specific API keys
+	[IsActive] BIT NOT NULL,
+	[IsDeleted] BIT NOT NULL,
+	[CreatedOn] DATETIMEOFFSET NOT NULL DEFAULT SYSUTCDATETIME(),
+    [LastUpdatedOn] DATETIMEOFFSET NULL
+)

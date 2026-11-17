@@ -1,0 +1,99 @@
+﻿@using Newtonsoft.Json
+@model AMAIS.WKFLO.MD.WebAPI.Models.ChatViewModel
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "_LayoutChat";
+}
+
+<div id="@Model.TargetElementId">
+</div>
+
+<script>
+    // Load the widget script
+    var script = document.createElement('script');
+    script.src = '@Model.WidgetScriptUrl';
+    script.type = 'text/javascript';
+    
+    // Handle script loading
+    script.onload = function() {
+        console.log('Widget script loaded successfully');
+        initializeWidget();
+    };
+    
+    script.onerror = function() {
+        console.error('Failed to load widget script');
+        document.getElementById('@Model.ContainerId').innerHTML = 
+            '<p style="color: red;">Error: Could not load chat widget script from @Model.WidgetScriptUrl</p>';
+    };
+    
+    // Append script to head
+    document.head.appendChild(script);
+    
+    function initializeWidget() {
+        try {
+            // Check if WkfloWidget is available
+            if (typeof WkfloWidget !== 'undefined') {
+                // Initialize the widget with configuration from the view model
+                const config = {
+                    shareId: @Html.Raw(Json.Serialize(Model.ShareId)) || 'default-agent',
+                    tenantGuid: @Html.Raw(Json.Serialize(Model.TenantGuid)),
+                    agentName: @Html.Raw(Json.Serialize(Model.AgentName)),
+                    agentDescription: @Html.Raw(Json.Serialize(Model.Description)),
+                    headerTitle: @Html.Raw(Json.Serialize(Model.HeaderTitle)),
+                    welcomeMessage: @Html.Raw(Json.Serialize(Model.WelcomeMessage)),
+                    footerMessage: @Html.Raw(Json.Serialize(Model.FooterMessage)),
+                    predefinedPrompts: @Html.Raw(Json.Serialize(Model.PredefinedPrompts.Select(p => new { title = p.Title, prompt = p.Prompt }))),
+                    primaryColor: @Html.Raw(Json.Serialize(Model.PrimaryColor)),
+                    bubbleStyle: @Html.Raw(Json.Serialize(Model.BubbleStyle)),
+                    bubbleIconPath: @Html.Raw(Json.Serialize(Model.BubbleIconPath)),
+                    chatbotIconPath: @Html.Raw(Json.Serialize(Model.ChatbotIconPath)),
+                    cssUrl: @Html.Raw(Json.Serialize(Model.CssUrl)),
+                    showDescription: @Model.ShowDescription.ToString().ToLower(),
+                    chainOfThought: @Model.ChainOfThought.ToString().ToLower(),
+                    isVoiceChatEnabled: @Model.IsVoiceChatEnabled.ToString().ToLower(),
+                    canSelectFeature: @Model.CanSelectFeature.ToString().ToLower(),
+                    isMaisyAgent: @Model.IsMaisyAgent.ToString().ToLower(),
+                    apiEndpoint: @Html.Raw(Json.Serialize(Model.ApiEndpoint)),
+                    baseUrl: (() => {
+                        try {
+                            return new URL('@Model.WidgetScriptUrl').origin;
+                        } catch (e) {
+                            console.warn('WkfloWidget: could not derive baseUrl from WidgetScriptUrl', e);
+                            return '';
+                        }
+                    })(),
+                    containerId: '@Model.ContainerId',
+                    targetElement: '#@Model.TargetElementId',
+                    securityConfiguration: {
+                        type: '@(Model.SecurityConfiguration?.Type ?? "none")'@if (Model.SecurityConfiguration?.AzureAd != null) {<text>,
+                        azureAd: {
+                            clientId: '@Model.SecurityConfiguration.AzureAd.ClientId',
+                            tenantId: '@Model.SecurityConfiguration.AzureAd.TenantId',
+                            scopes: @Html.Raw(Json.Serialize(Model.SecurityConfiguration.AzureAd.Scopes ?? new string[0]))
+                        }</text>}@if (Model.SecurityConfiguration?.ApiKey != null) {<text>,
+                        apiKey: {
+                            value: '@Model.SecurityConfiguration.ApiKey.Value',
+                            tenantName: '@Model.SecurityConfiguration.ApiKey.TenantName'
+                        }</text>}@if (Model.SecurityConfiguration?.Jwt != null) {<text>,
+                        jwt: {
+                            domains: @Html.Raw(JsonConvert.SerializeObject(Model.SecurityConfiguration.Jwt.Domains))  
+                        }</text>}
+                    }
+                };
+                
+                const widget = new WkfloWidget(config, false);
+                widget.show();
+                
+                console.log('Widget initialized successfully with ShareId:', '@Model.ShareId');
+            } else {
+                console.error('WkfloWidget class not found');
+                document.getElementById('@Model.ContainerId').innerHTML = 
+                    '<p style="color: red;">Error: WkfloWidget class not available</p>';
+            }
+        } catch (error) {
+            console.error('Error initializing widget:', error);
+            document.getElementById('@Model.ContainerId').innerHTML = 
+                '<p style="color: red;">Error initializing widget: ' + error.message + '</p>';
+        }
+    }
+</script>

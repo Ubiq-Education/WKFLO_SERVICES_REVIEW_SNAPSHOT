@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+   <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.5.2" />
+   <PackageReference Include="EFCoreSecondLevelCacheInterceptor.HybridCache" Version="5.5.2" />
+   <PackageReference Include="Microsoft.Data.SqlClient.Extensions.Azure" Version="7.1.1" />
+   <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13" />
+   <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.13" />
+   <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.13" />
+   <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.13" />
+   <PackageReference Include="ModelContextProtocol" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AMAIS.WKFLO.Common\AMAIS.WKFLO.Common.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.17.9" />
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.9" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AMAIS_WKFLO\AMAIS_WKFLO_COMMON\src\AMAIS.WKFLO.Common.Infrastructure\AMAIS.WKFLO.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\AMAIS_WKFLO\AMAIS_WKFLO_COMMON\src\AMAIS.WKFLO.Common.MD.Application\AMAIS.WKFLO.Common.MD.Application.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Mediator.SourceGenerator" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <!-- MIT-licensed, fully free (Microsoft-backed) — replaces SixLabors.ImageSharp, which has a
+         paid tier above certain usage thresholds. Already vetted/used elsewhere on this platform
+         (PetraCMS.Web references SkiaSharp too). NativeAssets.Linux.NoDependencies is required
+         because this project deploys to Linux containers (mcr.microsoft.com/dotnet/aspnet base
+         image) and the core SkiaSharp package only bundles Win32/macOS native assets by default;
+         the "NoDependencies" variant statically links its native deps so no extra apt packages
+         (fontconfig, etc.) are needed in the container image. -->
+    <PackageReference Include="SkiaSharp" Version="4.153.1" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
+  </ItemGroup>
+</Project>

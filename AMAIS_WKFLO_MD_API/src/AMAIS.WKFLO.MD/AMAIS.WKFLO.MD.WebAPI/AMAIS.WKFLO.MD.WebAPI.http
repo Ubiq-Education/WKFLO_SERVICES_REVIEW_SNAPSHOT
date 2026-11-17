@@ -1,0 +1,6 @@
+@AMAIS.WKFLO.MD.WebAPI_HostAddress = http://localhost:5110
+
+GET {{AMAIS.WKFLO.MD.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

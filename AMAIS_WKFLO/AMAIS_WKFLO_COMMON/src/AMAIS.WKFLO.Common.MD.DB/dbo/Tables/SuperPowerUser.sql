@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[SuperPowerUser]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+	[Email] NVARCHAR(320) NOT NULL,
+	[CreatedBy] NVARCHAR(320) NULL,
+	[IsDeleted] BIT NOT NULL DEFAULT 0,
+	[CreatedOn] DATETIMEOFFSET NOT NULL DEFAULT SYSUTCDATETIME(),
+    [LastUpdatedOn] DATETIMEOFFSET NULL
+)
+
+GO
+
+CREATE UNIQUE INDEX IX_SuperPowerUser_Email ON [dbo].[SuperPowerUser] ([Email]);

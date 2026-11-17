@@ -1,0 +1,16 @@
+CREATE TABLE [dbo].[User]
+(
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+	[Email] NVARCHAR(320) NOT NULL,
+	[IsDeleted] BIT NOT NULL DEFAULT 0,
+	[CreatedOn] DATETIMEOFFSET NOT NULL DEFAULT SYSUTCDATETIME(),
+    [LastUpdatedOn] DATETIMEOFFSET NULL
+)
+
+GO
+
+CREATE UNIQUE INDEX IX_User_Email ON [dbo].[User] ([Email]) WHERE [IsDeleted] = 0;
+
+GO
+
+CREATE INDEX IX_User_CreatedOn ON [dbo].[User] ([CreatedOn]);

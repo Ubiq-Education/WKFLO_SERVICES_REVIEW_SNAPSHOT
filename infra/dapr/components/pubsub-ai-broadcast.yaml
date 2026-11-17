@@ -1,0 +1,35 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-ai-broadcast
+spec:
+  # US 7501: Stop broadcast (topic "wkflo-chat-stop"). Unlike pubsub-ai, every AI API replica must receive every message,
+  # so each sidecar has its own consumer id and therefore its own queue. Azure uses a Service Bus topics component
+  # with the same name (one subscription per replica).
+  type: pubsub.rabbitmq
+  version: v1
+  metadata:
+    # RabbitMQ connection (same broker as pubsub-ai)
+    - name: connectionString
+      value: amqp://guest:guest@rabbitmq:5672
+
+    # One queue per sidecar: Dapr replaces {uuid} with a random UUIDv4 at sidecar startup.
+    - name: consumerID
+      value: "{uuid}"
+    - name: exchangeKind
+      value: topic
+
+    # A replica's queue is useless once it is gone: non-durable and deleted when its consumer disconnects.
+    - name: durable
+      value: "false"
+    # pubsub.rabbitmq spells it "deletedWhenUnused" ("deleteWhenUnused" is the bindings.rabbitmq key).
+    - name: deletedWhenUnused
+      value: "true"
+    - name: autoAck
+      value: "false"
+
+    # Not a pubsub.rabbitmq key ("maxConcurrentHandlers" is Service Bus); parallel handling is the default ("concurrency").
+    - name: prefetchCount
+      value: "1"
+scopes:
+  - amais-wkflo-ai-webapi

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AMAIS_WKFLO\AMAIS_WKFLO_COMMON\src\AMAIS.WKFLO.Common.AI.Application\AMAIS.WKFLO.Common.AI.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\AMAIS_WKFLO\AMAIS_WKFLO_COMMON\src\AMAIS.WKFLO.Common.Infrastructure\AMAIS.WKFLO.Common.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

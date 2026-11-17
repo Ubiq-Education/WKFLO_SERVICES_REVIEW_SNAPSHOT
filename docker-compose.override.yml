@@ -1,0 +1,440 @@
+services:
+  amais-wkflo-md-webapi:
+    container_name: amais-wkflo-md-webapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_MD_API/src/AMAIS.WKFLO.MD/AMAIS.WKFLO.MD.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=amais-wkflo-md-webapi-local-${OTEL_SUFFIX-default}
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING-Server=sqlserver;Database=WKFLO.DB;User Id=sa;Password=Password12345!;TrustServerCertificate=True;}
+      # EF second-level cache: shared HybridCache L2 + invalidation broadcast between MD API and AI API replicas.
+      - REDIS_CONNECTION_STRING=redis:6379,abortConnect=false
+      - PG_DB_HOST=${PG_DB_HOST-none}
+      - PG_DB_PORT=${PG_DB_PORT-none}
+      - PG_DB_NAME=${PG_DB_NAME-none}
+      - PG_DB_USER=${PG_DB_USER-none}
+      - DAPR_HOST=localhost
+      - DAPR_HTTP_PORT=3502
+      - DAPR_GRPC_PORT=50003
+      - DEFAULT_WEB_ORIGINS=https://localhost;https://localhost:32771
+      - STATIC_WEBSITE_BASE_URL=https://staging.static.wkflo.ai
+      - McpOAuthSettings__PublicBaseUrl=${MCP_OAUTH_PUBLIC_BASE_URL-https://localhost:32771}
+      - MCP_OAUTH_TOKEN_ENCRYPTION_KEY=${MCP_OAUTH_TOKEN_ENCRYPTION_KEY-none}
+    ports:
+      - "32772:8080"
+      - "32773:8081"
+    depends_on:
+      - sqlserver
+      - redis
+      - placement
+      - scheduler
+      - alloy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - wkflonetwork2
+
+  amais-wkflo-ai-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkfloaiwebapi
+    container_name: amais-wkflo-ai-webapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_AI_API/src/AMAIS.WKFLO.AI/AMAIS.WKFLO.AI.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - DAPR_HOST=localhost
+      - DAPR_HTTP_PORT=3500
+      - DAPR_GRPC_PORT=50001
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=amais-wkflo-ai-webapi-local-${OTEL_SUFFIX-default}
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING-Server=sqlserver;Database=WKFLO.DB;User Id=sa;Password=Password12345!;TrustServerCertificate=True;}
+      # EF second-level cache: shared HybridCache L2 + invalidation broadcast between MD API and AI API replicas.
+      - REDIS_CONNECTION_STRING=redis:6379,abortConnect=false
+      - AMAIS_URL_TEST=https://host.docker.internal:44332
+      - AMAIS_ROLE_TEST=SuperAdmin
+      - AMAIS_MCP_SERVER=http://host.docker.internal:32874
+      - AMAIS_DXP_MCP_SERVER=${AMAIS_DXP_MCP_SERVER-http://host.docker.internal:32974}
+      - MCP_OAUTH_TOKEN_ENCRYPTION_KEY=${MCP_OAUTH_TOKEN_ENCRYPTION_KEY-none}
+      - CENTRAL_KEY_VAULT_URI=${CENTRAL_KEY_VAULT_URI-https://kv-uks-amais-central.vault.azure.net/}
+      - PG_DB_HOST=${PG_DB_HOST-none}
+      - PG_DB_PORT=${PG_DB_PORT-none}
+      - PG_DB_NAME=${PG_DB_NAME-none}
+      - PG_DB_USER=${PG_DB_USER-none}
+      # Bug 8189: documents with more extracted text than this are indexed into chat_documents instead of kept inline.
+      # Set CHAT_DOCUMENT_INLINE_MAX_CHARS=2000 in .env to test indexing and search_attached_documents with a small file.
+      - ChatDocumentSettings__InlineMaxChars=${CHAT_DOCUMENT_INLINE_MAX_CHARS-50000}
+      - AZURE_SPEECH_ENDPOINT=https://ai-services-demo-ubiq.cognitiveservices.azure.com/
+      # - AZURE_CLIENT_ID=8c8cddc5-eb62-4f80-b235-d0e243590e5c
+      # - AZURE_TENANT_ID=bf3e1181-ffe9-40f7-aee4-11dc5fd642c6
+      # - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET-none}
+      - AMAIS_DXP_INGRESS_SERVER_URL=${AMAIS_DXP_INGRESS_SERVER_URL-none}
+      - AMAIS_DXP_CLIENT_AUTH_FLOW=${AMAIS_DXP_CLIENT_AUTH_FLOW-none}
+      # - OAuthBehaviourSettings__CacheEnable=true
+      # - OAuthBehaviourSettings__RetrieveTokenBeforeExpiration=60
+      # - OAuthBehaviourSettings__SlidingExpirationTime=2419200
+      - IngressClientOAuthSettings__ClientId=${AMAIS_DXP_INGRESS_MI_CLIENT_ID-none}
+      - IngressClientOAuthSettings__Audience=${AMAIS_DXP_INGRESS_AUDIENCE-none}
+      - AMAIS_DXP_MASTERDATA_SERVER_URL=${AMAIS_DXP_MASTERDATA_SERVER_URL-none}
+      - MasterDataClientOAuthSettings__ClientId=${AMAIS_DXP_MASTERDATA_MI_CLIENT_ID-none}
+      - MasterDataClientOAuthSettings__Audience=${AMAIS_DXP_MASTERDATA_AUDIENCE-none}
+    ports:
+      - "32774:8080"
+      - "32775:8081"
+    depends_on:
+      - sqlserver
+      - scheduler
+      - redis
+      - alloy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - wkflonetwork2
+
+  placement:
+    image: daprio/dapr:1.16.4
+    container_name: placement
+    command: ["./placement", "-port", "6111"]
+    ports:
+      - "6111:6111"
+    networks:
+      - wkflonetwork2
+
+  scheduler:
+    image: daprio/dapr:1.16.4
+    container_name: scheduler
+    command: ["./scheduler", "--etcd-data-dir=/var/lock/dapr/scheduler", "--port", "6222"]
+    networks:
+      - wkflonetwork2
+
+  amais-wkflo-worker-webapi:
+    container_name: amais-wkflo-worker-webapi
+    build:
+      context: ./
+      dockerfile: AMAIS_WKFLO_WORKER/src/AMAIS.WKFLO.Worker/AMAIS.WKFLO.Worker.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - DAPR_HOST=localhost
+      - DAPR_HTTP_PORT=3501
+      - DAPR_GRPC_PORT=50002
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=amais-wkflo-worker-webapi-local-${OTEL_SUFFIX-default}
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING-Server=sqlserver;Database=WKFLO.DB;User Id=sa;Password=Password12345!;TrustServerCertificate=True;}
+      - AMAIS_DXP_INGRESS_SERVER_URL=${AMAIS_DXP_INGRESS_SERVER_URL-none}
+      - AMAIS_DXP_CLIENT_AUTH_FLOW=${AMAIS_DXP_CLIENT_AUTH_FLOW-none}
+      - IngressClientOAuthSettings__ClientId=${AMAIS_DXP_INGRESS_MI_CLIENT_ID-none}
+      - IngressClientOAuthSettings__Audience=${AMAIS_DXP_INGRESS_AUDIENCE-none}
+    ports:
+      - "32876:8080"
+      - "32877:8081"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - redis
+      - placement
+      - scheduler
+      - alloy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - wkflonetwork2
+
+  dapr-md-1:
+    image: daprio/daprd:1.16.4
+    container_name: dapr-md-1
+    environment:
+      - LOG_LEVEL=debug
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_SERVICE_NAME=dapr.amais-wkflo-md-webapi-${OTEL_SUFFIX-default}
+    command:
+      [
+        "./daprd",
+        "--app-id", "amais-wkflo-md-webapi",
+        "--app-port", "8080",
+        "--dapr-http-port", "3502",
+        "--dapr-grpc-port", "50003",
+        "--placement-host-address", "placement:6111",
+        "--scheduler-host-address", "scheduler:6222",
+        "--resources-path", "/resources",
+        "--config", "/dapr/config.yaml"
+      ]
+    volumes:
+      - ./infra/dapr/components:/resources
+      - ./infra/dapr/dapr-config.yaml:/dapr/config.yaml
+    depends_on:
+      - amais-wkflo-md-webapi
+      - placement
+      - scheduler
+    network_mode: "service:amais-wkflo-md-webapi"
+
+  dapr-worker-1:
+    image: daprio/daprd:1.16.4
+    container_name: dapr-worker-1
+    environment:
+      - LOG_LEVEL=debug
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_SERVICE_NAME=dapr.amais-wkflo-worker-webapi-${OTEL_SUFFIX-default}
+    command:
+      [
+        "./daprd",
+        "--app-id", "amais-wkflo-worker-webapi",
+        "--app-port", "8080",
+        "--dapr-http-port", "3501",
+        "--dapr-grpc-port", "50002",
+        "--placement-host-address", "placement:6111",
+        "--scheduler-host-address", "scheduler:6222",
+        "--resources-path", "/resources",
+        "--config", "/dapr/config.yaml"
+      ]
+    volumes:
+      - ./infra/dapr/components:/resources
+      - ./infra/dapr/dapr-config.yaml:/dapr/config.yaml
+    depends_on:
+      - amais-wkflo-worker-webapi
+      - rabbitmq
+      - redis
+      - placement
+      - scheduler
+    network_mode: "service:amais-wkflo-worker-webapi"
+
+  dapr-ai-1:
+    image: daprio/daprd:1.16.4
+    container_name: dapr-ai-1
+    environment:
+      - LOG_LEVEL=debug
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_SERVICE_NAME=dapr.amais-wkflo-ai-webapi-${OTEL_SUFFIX-default}
+    command:
+      [
+        "./daprd",
+        "--app-id", "amais-wkflo-ai-webapi",
+        "--app-port", "8080",
+        "--dapr-http-port", "3500",
+        "--dapr-grpc-port", "50001",
+        "--placement-host-address", "placement:6111",
+        "--scheduler-host-address", "scheduler:6222",
+        "--resources-path", "/resources",
+        "--config", "/dapr/config.yaml",
+        # Chat messages queue image attachments as base64 in the SaveStateAsync payload
+        # (see WkfloQueueMessage usage in TenantAgentChatMessage/PublicAgentChatMessage) —
+        # the 4MB gRPC/HTTP default was too small for messages with image attachments.
+        "--max-body-size", "20M"
+      ]
+    volumes:
+      - ./infra/dapr/components:/resources
+      - ./infra/dapr/dapr-config.yaml:/dapr/config.yaml
+    depends_on:
+      - amais-wkflo-ai-webapi
+      - rabbitmq
+      - redis
+      - placement
+      - scheduler
+    network_mode: "service:amais-wkflo-ai-webapi"
+
+  amais-wkflo-bff-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflobffwebapi
+    container_name: amais-wkflo-bff-webapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_BFF/src/AMAIS.WKFLO.BFF/AMAIS.WKFLO.BFF.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=amais-wkflo-bff-webapi-local-${OTEL_SUFFIX-default}
+    ports:
+      - "32770:8080"
+      - "32771:8081"
+    depends_on:
+      - amais-wkflo-md-webapi
+      - amais-wkflo-ai-webapi
+      - alloy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - wkflonetwork2
+
+  amais-wkflo-mcp-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflomcpwebapi
+    container_name: amais-wkflo-mcp-webapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_MCP_SERVER/src/AMAIS.WKFLO.MCP/AMAIS.WKFLO.MCP.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - CENTRAL_KEY_VAULT_URI=${CENTRAL_KEY_VAULT_URI-https://kv-uks-amais-central.vault.azure.net/}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=amais-wkflo-mcp-webapi-local-${OTEL_SUFFIX-default}
+      - USER_AGENT_HEADER=Ubiq-AMAIS-4e2eed4a-660b-4bfb-9206-b483f05c3c4c/1.0
+    ports:
+      - "32874:8080"
+      - "32875:8081"
+    depends_on:
+      - sqlserver
+      - alloy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - wkflonetwork2
+
+  amais-wkflo-dxp-mcp-webapi:
+    image: ${DOCKER_REGISTRY-}amaiswkflodxpmcpwebapi
+    container_name: amais-wkflo-dxp-mcp-webapi
+    build:
+      context:  ./
+      dockerfile: AMAIS_WKFLO_DXP_MCP_SERVER/src/AMAIS.WKFLO.DXP.MCP/AMAIS.WKFLO.DXP.MCP.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - CENTRAL_KEY_VAULT_URI=${CENTRAL_KEY_VAULT_URI-https://kv-uks-amais-central.vault.azure.net/}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=amais-wkflo-dxp-mcp-webapi-local-${OTEL_SUFFIX-default}
+      - AMAIS_DXP_REPORT_SERVER_URL=${AMAIS_DXP_REPORT_SERVER_URL-none}
+      - AMAIS_DXP_CLIENT_AUTH_FLOW=${AMAIS_DXP_CLIENT_AUTH_FLOW-none}
+      - ReportClientOAuthSettings__ClientId=${AMAIS_DXP_REPORT_MI_CLIENT_ID-none}
+      - ReportClientOAuthSettings__Audience=${AMAIS_DXP_REPORT_AUDIENCE-none}
+      # AmaisJwtScheme__Issuer / AmaisJwtScheme__KeyName come from the local (untracked) appsettings.Development.json, as for the AMAIS MCP Server.
+    ports:
+      - "32974:8080"
+      - "32975:8081"
+    depends_on:
+      - alloy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - wkflonetwork2
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "${MSSQL_SA_PASSWORD-Password12345!}"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1401:1433"
+    volumes:
+      - sqlvolume:/var/opt/mssql
+    networks:
+      - wkflonetwork2
+
+  # otel-collector:
+  #   image: otel/opentelemetry-collector
+  #   container_name: otel-collector
+  #   command: ["--config=/etc/otel-collector.yaml"]
+  #   volumes:
+  #     - ./infra/otel/otel-collector.yaml:/etc/otel-collector.yaml
+  #   networks:
+  #     - wkflonetwork2
+
+  # jaeger:
+  #   image: jaegertracing/jaeger
+  #   container_name: jaeger
+  #   environment:
+  #     - LOG_LEVEL=debug
+  #   ports:
+  #     - "16686:16686"
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   networks:
+  #     - wkflonetwork2
+
+  alloy:
+    image: grafana/alloy:v1.12.1
+    container_name: alloy
+    environment:
+      - ALLOY_LOG_LEVEL=debug
+      - GRAFANA_TEMPO_ENDPOINT=${GRAFANA_TEMPO_ENDPOINT-none}
+      - TEMPO_USERNAME=${TEMPO_USERNAME-none}
+      - GRAFANA_LOKI_ENDPOINT=${GRAFANA_LOKI_ENDPOINT-none}
+      - LOKI_USERNAME=${LOKI_USERNAME-none}
+      - GRAFANA_PROMETHEUS_ENDPOINT=${GRAFANA_PROMETHEUS_ENDPOINT-none}
+      - PROMETHEUS_USERNAME=${PROMETHEUS_USERNAME-none}
+      - GRAFANA_CLOUD_API_KEY=${GRAFANA_CLOUD_API_KEY-none}
+    ports:
+      - "12347:12345"
+      - "12348:12348"
+      - "12350:12350"
+      # - "6832:6832"
+      # - "55679:55679"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - "./infra/alloy/config.alloy:/etc/alloy/config.alloy"
+    command: [
+      "run",
+      "--server.http.listen-addr=0.0.0.0:12345",
+      "--stability.level=public-preview",
+      "/etc/alloy/config.alloy",
+    ]
+    networks:
+      - wkflonetwork2
+
+  rabbitmq:
+    image: rabbitmq:4.3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    networks:
+      - wkflonetwork2
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks:
+      - wkflonetwork2
+
+networks:
+  wkflonetwork2:
+    driver: bridge
+
+volumes:
+  sqlvolume:
+    external: true
+    name: external-sqlvolume

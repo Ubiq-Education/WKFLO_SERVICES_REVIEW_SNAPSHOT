@@ -1,0 +1,73 @@
+// ── Receiver ────────────────────────────────────────────────────────────────
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces  = [otelcol.processor.batch.traces.input]
+    logs    = [otelcol.processor.batch.logs.input]
+    metrics = [otelcol.processor.batch.metrics.input]
+  }
+}
+
+// ── Batch processors ────────────────────────────────────────────────────────
+otelcol.processor.batch "traces" {
+  output {
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+otelcol.processor.batch "logs" {
+  output {
+    logs = [otelcol.exporter.otlphttp.loki.input]
+  }
+}
+
+otelcol.processor.batch "metrics" {
+  output {
+    metrics = [otelcol.exporter.otlphttp.prometheus.input]
+  }
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+otelcol.auth.basic "tempo_creds" {
+  username = sys.env("TEMPO_USERNAME")
+  password = sys.env("GRAFANA_CLOUD_API_KEY")
+}
+
+otelcol.auth.basic "loki_creds" {
+  username = sys.env("LOKI_USERNAME")
+  password = sys.env("GRAFANA_CLOUD_API_KEY")
+}
+
+otelcol.auth.basic "prometheus_creds" {
+  username = sys.env("PROMETHEUS_USERNAME")
+  password = sys.env("GRAFANA_CLOUD_API_KEY")
+}
+
+// ── Exporters ────────────────────────────────────────────────────────────────
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = sys.env("GRAFANA_TEMPO_ENDPOINT")
+    auth     = otelcol.auth.basic.tempo_creds.handler
+  }
+}
+
+otelcol.exporter.otlphttp "loki" {
+  client {
+    endpoint = sys.env("GRAFANA_LOKI_ENDPOINT")
+    auth     = otelcol.auth.basic.loki_creds.handler
+  }
+}
+
+otelcol.exporter.otlphttp "prometheus" {
+  client {
+    endpoint = sys.env("GRAFANA_PROMETHEUS_ENDPOINT")
+    auth     = otelcol.auth.basic.prometheus_creds.handler
+  }
+}
